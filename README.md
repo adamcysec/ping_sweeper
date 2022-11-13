@@ -1,7 +1,7 @@
 # ping_sweeper.py
 
 ## Synposis
-Ping one or more IPs.
+Ping one or more IPs, cidrs, or urls.
 
 ## Description
 Simple ping sweeper tool using scapy. 
