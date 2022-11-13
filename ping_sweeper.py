@@ -17,12 +17,16 @@ def get_args():
         py ping_sweeper.py -ip "192.168.1.1-20"
         py ping_sweeper.py -ip "192.168.1.100, 192.168.1.6, 192.168.1.1-20"
         py ping_sweeper.py -c "192.168.3.0/24" -ip "192.168.1.100, 192.168.1.6, 192.168.1.1-20"
+        py ping_sweeper.py -u "google.com"
+        py ping_sweeper.py -u "google.com, amazon.com"
         ''')
     )
 
     parser.add_argument('-c', '--cidr', action='store', type=str, required=False, help="cidr range")
     parser.add_argument('-ip', action='store', type=str, required=False, help="one or more target IPs in csv format")
     parser.add_argument('-src', action='store', type=str, required=False, help="source ip")
+    parser.add_argument('-u', '--url', action='store', type=str, required=False, help="one or more url to ping in csv format")
+    parser.add_argument('-dns', action='store', type=str, default='8.8.8.8', required=False, help="IP of DNS to use, if pinging a url")
     parser.add_argument('--verbose', '-v', action='store_true', help="print verbose output")
 
     args = parser.parse_args() # parse arguments
@@ -37,10 +41,13 @@ def main():
     ip = args['ip']
     src_ip = args['src']
     verbose = args['verbose']
+    urls = args['url']
+    dns = args['dns']
+
+    live_hosts = []
 
     if ip:
-        live_hosts = []
-        ip_list = get_ip_list(ip)
+        ip_list = get_arg_list(ip)
 
         # if target ip contains a '-' (dash)
         for ip_target in ip_list:
@@ -72,6 +79,21 @@ def main():
             live = ping_target(dst_ip, src_ip, verbose)
             if live:
                 live_hosts.append(dst_ip)
+    
+    if urls:
+        url_list = get_arg_list(urls)
+        for url in url_list:
+            target_ip = do_dns_request(url, dns)
+            if target_ip == None:
+                print(f"unable to resolve {url}")
+                continue
+            else:
+                dst_ip = target_ip
+                live = ping_target(dst_ip, src_ip, verbose, url=url)
+                if live:
+                    live_hosts.append(dst_ip)
+
+
 
     if live_hosts:
         print(live_hosts)
@@ -103,30 +125,54 @@ def get_ip_range(ipRange):
 
     return int(start), int(end)
 
-def get_ip_list(ips):
-    """split supplied IPs into a list
+def get_arg_list(argument):
+    """split supplied argument into a list
 
     Parameters:
     -----------
-    ips : str
-        two or more IPs in csv format
+    argument : str
+        two or more args in csv format
 
     Returns:
     --------
-    ip_list : list
-        two or more IPs
+    arg_list : list
+        two or more args
     """
     
-    ip_list = []
+    arg_list = []
     
-    parts = ips.split(',')
+    parts = argument.split(',')
     for part in parts:
-        ip = part.strip()
-        ip_list.append(ip)
+        arg = part.strip()
+        arg_list.append(arg)
     
-    return ip_list
+    return arg_list
 
-def ping_target(dest_ip, src_ip, verbose):
+def do_dns_request(url, dns_ip):
+    """do DNS request on urls to ping their IP
+
+    Parameters:
+    -----------
+    url : str
+        url to request A record for
+    dns_ip : str
+        DNS IP address
+
+    Returns:
+    --------
+    target_ip : str
+        IPv4 address from A record 
+    """
+
+    res = sr1(IP(dst=dns_ip)/UDP(sport=RandShort(), dport=53)/DNS(rd=1,qd=DNSQR(qname=url,qtype="A")), verbose=0)
+    if res.an == None:
+        target_ip = None
+    else:
+        target_ip = res.an.rdata
+
+    return target_ip
+
+def ping_target(dest_ip, src_ip, verbose, url=False):
     """ping target ip
     
     Parameters:
@@ -155,10 +201,16 @@ def ping_target(dest_ip, src_ip, verbose):
 
     if res == None:
         if verbose:
-            print(red(f"{dest_ip} - no response"))
+            if url:
+                print(red(f"{dest_ip} ({url}) - no response"))
+            else:
+                print(red(f"{dest_ip} - no response"))
         host_live = False
     else:
-        print(green(f"{dest_ip} - is up"))
+        if url:
+            print(green(f"{dest_ip} ({url}) - is up"))
+        else:
+            print(green(f"{dest_ip} - is up"))
         host_live = True
     
     return host_live
