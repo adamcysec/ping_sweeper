@@ -6,7 +6,7 @@ Ping one or more IPs.
 ## Description
 Simple ping sweeper tool using scapy. 
 
-Allows you to use an IP, range of IPs, or cidr range, or all at the same time. 
+Allows you to use an IP, range of IPs, cidr range, or all at the same time. 
 
 ## Dependencies
 ping_sweeper.py requires the following dependencies:
