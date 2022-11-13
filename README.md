@@ -34,6 +34,15 @@ ping_sweeper.py requires the following dependencies:
 - default value is your machine's IP
 - allows you to spoof the IP in the packet, but then the response will never be returned to your machine.
 
+**Parameter --url, -u**
+- type : str
+- one or more urls to ping in csv format
+
+**Parameter -dns**
+- type : str
+- the dns to use when resolving urls
+- default = 8.8.8.8
+
 **Parameter --verbose, -v**
 - type : boolean
 - print verbose output
@@ -76,3 +85,15 @@ ping_sweeper.py requires the following dependencies:
 `py ping_sweeper.py -c "192.168.3.0/24" -ip "192.168.1.100, 192.168.1.6, 192.168.1.1-20"`
 
 - Ping a cidr range, two IPs, and a range of IPs
+
+**Example 7**
+
+`py ping_sweeper.py -u "google.com"`
+
+- Ping one url
+
+**Example 8**
+
+`py ping_sweeper.py -u "google.com, amazon.com"`
+
+- Ping two urls
