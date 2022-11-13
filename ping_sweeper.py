@@ -37,7 +37,7 @@ def get_args():
 
 def main():
     args = get_args()
-    cidr = args['cidr']
+    cidrs = args['cidr']
     ip = args['ip']
     src_ip = args['src']
     verbose = args['verbose']
@@ -72,13 +72,15 @@ def main():
                 if live:
                     live_hosts.append(dst_ip)
 
-    if cidr:
-        cidr_range = ipaddress.ip_network(cidr)
-        for ip_target in cidr_range:
-            dst_ip = str(ip_target)
-            live = ping_target(dst_ip, src_ip, verbose)
-            if live:
-                live_hosts.append(dst_ip)
+    if cidrs:
+        cidr_list = get_arg_list(cidrs)
+        for cidr in cidr_list:
+            cidr_range = ipaddress.ip_network(cidr)
+            for ip_target in cidr_range:
+                dst_ip = str(ip_target)
+                live = ping_target(dst_ip, src_ip, verbose)
+                if live:
+                    live_hosts.append(dst_ip)
     
     if urls:
         url_list = get_arg_list(urls)
