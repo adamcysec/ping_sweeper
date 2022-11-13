@@ -59,7 +59,7 @@ ping_sweeper.py requires the following dependencies:
 
 - Ping two IPS and a range of IPs
 
-**Example 6 **
+**Example 6**
 
 `py ping_sweeper.py -c "192.168.3.0/24" -ip "192.168.1.100, 192.168.1.6, 192.168.1.1-20"`
 
