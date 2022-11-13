@@ -26,6 +26,16 @@ ping_sweeper.py requires the following dependencies:
 - one or more IPs in csv format
 - range of IPs; must specifiy range in the last octet only
 
+**Parameter -src**
+- type : str
+- set the src IP of the ping packet
+- default value is your machine's IP
+- allows you to spoof the IP in the packet, but then the response will never be returned to your machine.
+
+**Parameter --verbose, -v**
+- type : boolean
+- print verbose output
+
 <br/>
 <br/>
 
