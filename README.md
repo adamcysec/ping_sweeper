@@ -8,6 +8,8 @@ Simple ping sweeper tool using scapy.
 
 Allows you to use an IP, range of IPs, cidr range, or all at the same time. 
 
+The live hosts will be displayed in green. At the end of the scan, all live hosts are displayed in list format. 
+
 ## Dependencies
 ping_sweeper.py requires the following dependencies:
 - [scapy](https://pypi.org/project/scapy/)
